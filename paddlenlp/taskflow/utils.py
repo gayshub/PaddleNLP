@@ -25,12 +25,19 @@ import paddle
 from paddle.dataset.common import md5file
 from ..utils.log import logger
 from ..utils.downloader import get_path_from_url, DownloaderCheck
+import redis
 
 DOC_FORMAT = r"""
     Examples:
         .. code-block:: python
               """
 DOWNLOAD_CHECK = False
+
+
+def redisWords():
+    pool = redis.ConnectionPool(host='127.0.0.1', port=6379, db=0, decode_responses=True)
+    r = redis.Redis(connection_pool=pool)
+    return r
 
 
 def download_file(save_dir, filename, url, md5=None):
@@ -669,8 +676,12 @@ class Customization(object):
     def load_customization(self, filename, sep=None):
         """Load the custom vocab"""
         self.ac = TriedTree()
+
+
+        
         with open(filename, 'r', encoding='utf8') as f:
             for line in f:
+                print("line: ", line)
                 if sep == None:
                     words = line.strip().split()
                 else:
@@ -679,11 +690,12 @@ class Customization(object):
 
                 if len(words) == 0:
                     continue
-
+                print("words: ", words)
                 phrase = ""
                 tags = []
                 offset = []
                 for word in words:
+                    print("word.rfind('/'): ", word.rfind('/'))
                     if word.rfind('/') < 1:
                         phrase += word
                         tags.append('')
@@ -691,12 +703,56 @@ class Customization(object):
                         phrase += word[:word.rfind('/')]
                         tags.append(word[word.rfind('/') + 1:])
                     offset.append(len(phrase))
-
+                    print("phrase: ", phrase)
+                print("phrase+: ", phrase)
                 if len(phrase) < 2 and tags[0] == '':
                     continue
-
+                print("tags: ", tags, "offset: ", offset)
                 self.dictitem[phrase] = (tags, offset)
+                print("self.dictitem: ", self.dictitem)
+                print("---->phrase: ", phrase)
                 self.ac.add_word(phrase)
+                print("self.ac: ", self.ac.__dict__)
+
+    def load_customization_redis(self, value, sep=None):
+        self.ac = TriedTree()
+        rw = redisWords()
+        print("--+-->", rw.smembers("words"))
+        for line in rw.smembers("words"):
+            print("line: ", line)
+            if sep == None:
+                words = line.strip().split()
+            else:
+                sep = strdecode(sep)
+                words = line.strip().split(sep)
+
+            if len(words) == 0:
+                continue
+            print("words: ", words)
+            phrase = ""
+            tags = []
+            offset = []
+            for word in words:
+                print("word.rfind('/'): ", word.rfind('/'))
+                if word.rfind('/') < 1:
+                    phrase += word
+                    tags.append('')
+                else:
+                    phrase += word[:word.rfind('/')]
+                    tags.append(word[word.rfind('/') + 1:])
+                offset.append(len(phrase))
+                print("phrase: ", phrase)
+            print("phrase+: ", phrase)
+            if len(phrase) < 2 and tags[0] == '':
+                continue
+            print("tags: ", tags, "offset: ", offset)
+            self.dictitem[phrase] = (tags, offset)
+            print("self.dictitem: ", self.dictitem)
+            print("---->phrase: ", phrase)
+            self.ac.add_word(phrase)
+            print("self.ac: ", self.ac.__dict__)
+
+
 
     def parse_customization(self, query, lac_tags, prefix=False):
         """Use custom vocab to modify the lac results"""
@@ -704,7 +760,8 @@ class Customization(object):
             logging.warning("customization dict is not load")
             return
         ac_res = self.ac.search(query)
-
+        print("query:", query, "lac_tags: ", lac_tags)
+        print("self.ac: ", self.ac.__dict__, " ac_res: ", ac_res)
         for begin, end in ac_res:
             phrase = query[begin:end]
             index = begin

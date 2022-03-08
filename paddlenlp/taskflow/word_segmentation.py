@@ -60,6 +60,7 @@ class WordSegmentationTask(LacTask):
         lengths = inputs['lens']
         preds = inputs['result']
         sents = inputs['text']
+        print("sents: ", sents, preds)
         final_results = []
         for sent_index in range(len(lengths)):
             single_result = {}
@@ -67,9 +68,12 @@ class WordSegmentationTask(LacTask):
                 self._id2tag_dict[str(index)]
                 for index in preds[sent_index][:lengths[sent_index]]
             ]
+            
             sent = sents[sent_index]
+            print("==========>", tags, "=====>", sent)
             if self._custom:
                 self._custom.parse_customization(sent, tags)
+            print("self._custom: ", self._custom.__dict__, "self._custom.ac.__dict__: ", self._custom.ac.__dict__)
             sent_out = []
             tags_out = []
             parital_word = ""

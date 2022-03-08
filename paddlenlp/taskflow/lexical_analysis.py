@@ -115,6 +115,7 @@ class LacTask(Task):
                  task, 
                  model,
                  user_dict=None,
+                 user_redis=None,
                  **kwargs):
         super().__init__(task=task, model=model, **kwargs)
         self._usage = usage
@@ -124,9 +125,15 @@ class LacTask(Task):
         self._get_inference_model()
         if self._user_dict:
             self._custom = Customization()
+            print("self._user_dict: ", self._user_dict)
             self._custom.load_customization(self._user_dict)
         else:
             self._custom = None
+        # 2020 03 07
+        self._user_redis = user_redis
+        if self._user_redis:
+            self._custom = Customization()
+            self._custom.load_customization_redis(self._user_redis)
 
     def _construct_input_spec(self):
         """
@@ -256,6 +263,8 @@ class LacTask(Task):
             sent = sents[sent_index]
             if self._custom:
                 self._custom.parse_customization(sent, tags)
+
+            #print("----->", self._custom)
             sent_out = []
             tags_out = []
             parital_word = ""

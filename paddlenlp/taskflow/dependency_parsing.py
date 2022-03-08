@@ -66,7 +66,7 @@ usage = r"""
            [{'word': ['三亚', '是', '一座', '美丽', '的', '城市'], 'head': [2, 0, 6, 6, 4, 2], 'deprel': ['SBV', 'HED', 'ATT', 'ATT', 'MT', 'VOB']}, {'word': ['他', '送', '了', '一本', '书'], 'head': [2, 0, 2, 5, 2], 'deprel': ['SBV', 'HED', 'MT', 'ATT', 'VOB']}]
            '''   
          """
-
+ 
 
 class DDParserTask(Task):
     """
@@ -198,6 +198,7 @@ class DDParserTask(Task):
         inputs = self._preprocess_words(inputs)
         outputs = self._run_model(inputs)
         results = self._postprocess(outputs)
+        print("____________================____________")
         return results
 
     def _construct_input_spec(self):
