@@ -32,7 +32,7 @@ from .dependency_parsing import DDParserTask
 from .text_correction import CSCTask
 from .text_similarity import TextSimilarityTask
 from .dialogue import DialogueTask
-
+from importlib import reload
 warnings.simplefilter(action='ignore', category=Warning, lineno=0, append=False)
 
 TASKS = {
@@ -241,6 +241,7 @@ class Taskflow(object):
         The main work function in the taskflow.
         """
         results = self.task_instance(inputs)
+        print("input: ", inputs, "results: ", results)
         return results
 
     def help(self):

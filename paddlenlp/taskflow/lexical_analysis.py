@@ -115,8 +115,6 @@ class LacTask(Task):
                  task, 
                  model,
                  user_dict=None,
-                 user_redis=None,
-                 connect=None,
                  **kwargs):
         super().__init__(task=task, model=model, **kwargs)
         self._usage = usage
@@ -130,12 +128,16 @@ class LacTask(Task):
             self._custom.load_customization(self._user_dict)
         else:
             self._custom = None
+        '''
         # 2020 03 07
         self._user_redis = user_redis
+        
         if self._user_redis:
             self._custom = Customization()
-            self._custom.load_customization_redis(connect)
-
+            #self._custom.load_customization_redis(connect)
+            self._custom.load_customization_redis()
+        '''
+ 
     def _construct_input_spec(self):
         """
        Construct the input spec for the convert dygraph model to static model.

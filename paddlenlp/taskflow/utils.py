@@ -31,8 +31,15 @@ DOC_FORMAT = r"""
         .. code-block:: python
               """
 DOWNLOAD_CHECK = False
+'''
+import redis
 
+def redisWordsSet():
+    pool = redis.ConnectionPool(host='127.0.0.1', port=6379, db=0, decode_responses=True)
+    r = redis.Redis(connection_pool=pool)
+    return r
 
+'''
 def download_file(save_dir, filename, url, md5=None):
     """
     Download the file from the url to specified directory. 
@@ -706,12 +713,12 @@ class Customization(object):
                 print("---->phrase: ", phrase)
                 self.ac.add_word(phrase)
                 print("self.ac: ", self.ac.__dict__)
-
-    def load_customization_redis(self, conn, sep=None):
+    '''
+    def load_customization_redis(self, sep=None):
         self.ac = TriedTree()
         # rw = redisWords()
-        print("--+-->", conn.smembers("words"))
-        for line in conn.smembers("words"):
+        rw = redisWordsSet()
+        for line in rw.smembers("words"):
             print("line: ", line)
             if sep == None:
                 words = line.strip().split()
@@ -746,7 +753,7 @@ class Customization(object):
             print("self.ac: ", self.ac.__dict__)
 
 
-
+    '''
     def parse_customization(self, query, lac_tags, prefix=False):
         """Use custom vocab to modify the lac results"""
         if not self.ac:
