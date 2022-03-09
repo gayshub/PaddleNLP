@@ -116,6 +116,7 @@ class LacTask(Task):
                  model,
                  user_dict=None,
                  user_redis=None,
+                 connect=None,
                  **kwargs):
         super().__init__(task=task, model=model, **kwargs)
         self._usage = usage
@@ -133,7 +134,7 @@ class LacTask(Task):
         self._user_redis = user_redis
         if self._user_redis:
             self._custom = Customization()
-            self._custom.load_customization_redis(self._user_redis)
+            self._custom.load_customization_redis(self._user_redis, connect)
 
     def _construct_input_spec(self):
         """
@@ -185,6 +186,8 @@ class LacTask(Task):
            1) Transform the raw text to token ids.
            2) Generate the other model inputs from the raw text and token ids.
         """
+
+        print("---------------------------》到这了")
         inputs = self._check_input_text(inputs)
         # Get the config from the kwargs
         batch_size = self.kwargs[
@@ -264,7 +267,7 @@ class LacTask(Task):
             if self._custom:
                 self._custom.parse_customization(sent, tags)
 
-            #print("----->", self._custom)
+            print("----888******->", self._custom.__dict__)
             sent_out = []
             tags_out = []
             parital_word = ""

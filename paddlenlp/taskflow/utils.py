@@ -25,19 +25,12 @@ import paddle
 from paddle.dataset.common import md5file
 from ..utils.log import logger
 from ..utils.downloader import get_path_from_url, DownloaderCheck
-import redis
 
 DOC_FORMAT = r"""
     Examples:
         .. code-block:: python
               """
 DOWNLOAD_CHECK = False
-
-
-def redisWords():
-    pool = redis.ConnectionPool(host='127.0.0.1', port=6379, db=0, decode_responses=True)
-    r = redis.Redis(connection_pool=pool)
-    return r
 
 
 def download_file(save_dir, filename, url, md5=None):
@@ -714,11 +707,11 @@ class Customization(object):
                 self.ac.add_word(phrase)
                 print("self.ac: ", self.ac.__dict__)
 
-    def load_customization_redis(self, value, sep=None):
+    def load_customization_redis(self, value, conn, sep=None):
         self.ac = TriedTree()
-        rw = redisWords()
-        print("--+-->", rw.smembers("words"))
-        for line in rw.smembers("words"):
+        # rw = redisWords()
+        print("--+-->", conn.smembers("words"))
+        for line in conn.smembers("words"):
             print("line: ", line)
             if sep == None:
                 words = line.strip().split()

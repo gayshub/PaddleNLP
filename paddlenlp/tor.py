@@ -18,6 +18,12 @@ import sys
 
 #from paddlenlp.taskflow import Taskflow
 #from paddlenlp import Taskflow
+import redis
+
+def redisWords():
+    pool = redis.ConnectionPool(host='127.0.0.1', port=6379, db=0, decode_responses=True)
+    r = redis.Redis(connection_pool=pool)
+    return r
 
 define('debug', type=bool, default=True, help="enable debug, default False")
 define('host', type=str, default="127.0.0.1", help="http listen host, default 127.0.0.1")
@@ -47,6 +53,7 @@ class DictImport():
 
 di = DictImport()
 dip = di.parse(options.dict)
+rcon = redisWords()
 
 class CheckHandler(tornado.web.RequestHandler):
 
@@ -55,7 +62,7 @@ class CheckHandler(tornado.web.RequestHandler):
         text = self.get_argument("text", None)
         text = ''.join(e for e in text if e.isalnum())
         text = text + "\n"
-        seg = Taskflow("word_segmentation", use_cuda=options.cuda, user_redis=True)
+        seg = Taskflow("word_segmentation", use_cuda=options.cuda, user_redis=True, connect=rcon)
 
         parse = seg(text)
         temp = {"拆分": parse}
