@@ -707,7 +707,7 @@ class Customization(object):
                 self.ac.add_word(phrase)
                 print("self.ac: ", self.ac.__dict__)
 
-    def load_customization_redis(self, value, conn, sep=None):
+    def load_customization_redis(self, conn, sep=None):
         self.ac = TriedTree()
         # rw = redisWords()
         print("--+-->", conn.smembers("words"))

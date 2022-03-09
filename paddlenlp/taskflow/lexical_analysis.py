@@ -134,7 +134,7 @@ class LacTask(Task):
         self._user_redis = user_redis
         if self._user_redis:
             self._custom = Customization()
-            self._custom.load_customization_redis(self._user_redis, connect)
+            self._custom.load_customization_redis(connect)
 
     def _construct_input_spec(self):
         """
